@@ -6,16 +6,16 @@ Examples of menus made with [sxHelpMenu](https://github.com/0xS4cha/sxHelpMenu):
 
 - **Vehicle widget**: shown while the player drives, hidden when they leave the driver seat. Made with the builder of `@sxHelpMenu/lib/menu.lua`.
   - **Statistics**: sliders out of 10 for speed, acceleration, braking and traction, and a footer with a rating and the top speed, like the GTA 6 card.
-  - **Live**: speed, RPM, gear and engine health, updated with `SetRow` only while this page is shown and only when a value changed.
-  - **Info**: plate, class, seats and doors with tones and icons.
-- **Guide**: three pages (welcome, controls, tips) made with `exports.sxHelpMenu:Show`, with a per page header and a footer. It stays open until it is closed with the command or `HideGuide`, or hides itself after an optional duration.
+  - **Live**: speed, RPM, engine health with tones from `thresholds`, and a `stats` row with the gear, the body health and the lights, updated with `SetRow` only while this page is shown and only when a value changed.
+  - **Info**: an `image` row with the picture of the model from the FiveM docs, plate, class, seats and doors with tones and icons, and a `keys` row with the vehicle keys.
+- **Guide**: three pages made with `exports.sxHelpMenu:Show`: a welcome page with an `image` banner from `images/guide.svg` and a `stats` row, the controls in `keys` rows, and tips with sliders toned by `thresholds` and a `countdown` to a daily reward. The tips page has its own header and the controls page a footer. It stays open until it is closed with the command or `HideGuide`, or hides itself after an optional duration.
 - **Position**: a command moves both menus to one of the nine anchors, saved in the KVP of the player.
 
 ## Dependencies
 
 | Resource | Purpose |
 | --- | --- |
-| [sxHelpMenu](https://github.com/0xS4cha/sxHelpMenu) | Required. Draws the menus, `ShowThisFrame` is needed by `ShowGuideFromTick` |
+| [sxHelpMenu](https://github.com/0xS4cha/sxHelpMenu) | Required, with the `countdown`, `keys`, `image` and `stats` rows and the `thresholds`. Draws the menus, `ShowThisFrame` is needed by `ShowGuideFromTick` |
 
 ## Installation
 
@@ -62,6 +62,7 @@ client/
   cl_utils.lua     Helpers, speed units and saved position
   cl_vehicle.lua   Vehicle widget made with the builder
   cl_guide.lua     Guide made with the exports and the position command
+images/            Banner of the guide
 shared/            Configuration
 ```
 
