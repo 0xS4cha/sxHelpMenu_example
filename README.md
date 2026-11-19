@@ -8,7 +8,7 @@ Examples of menus made with [sxHelpMenu](https://github.com/0xS4cha/sxHelpMenu):
   - **Statistics**: sliders out of 10 for speed, acceleration, braking and traction, and a footer with a rating and the top speed, like the GTA 6 card.
   - **Live**: speed, RPM, gear and engine health, updated with `SetRow` only while this page is shown and only when a value changed.
   - **Info**: plate, class, seats and doors with tones and icons.
-- **Guide**: three pages (welcome, controls, tips) made with `exports.sxHelpMenu:Show`, with a per page header, a footer and a duration.
+- **Guide**: three pages (welcome, controls, tips) made with `exports.sxHelpMenu:Show`, with a per page header and a footer. It stays open until it is closed with the command or `HideGuide`, or hides itself after an optional duration.
 - **Position**: a command moves both menus to one of the nine anchors, saved in the KVP of the player.
 
 ## Dependencies
@@ -52,7 +52,7 @@ Everything lives in `shared/config.lua`.
 | `Config.Vehicle.refresh` | `200` | Milliseconds between two checks of the live values |
 | `Config.Guide.command` | `'helpexample'` | Command of the guide |
 | `Config.Guide.position` | `nil` | Anchor of the guide |
-| `Config.Guide.duration` | `20000` | Milliseconds before the guide hides itself |
+| `Config.Guide.duration` | `0` | Milliseconds before the guide hides itself, `0` keeps it open until it is closed |
 | `Config.PositionCommand` | `'helpexample_position'` | Command that moves the menus |
 
 ## How it works
@@ -68,6 +68,21 @@ shared/            Configuration
 The vehicle widget is built once when the player takes the driver seat, with the model statistics read from the game. While the live page is shown, the values are read every `Config.Vehicle.refresh` ms and sent with `SetRow` only when they changed, with `scramble = false` on the gear so the text does not animate on every update. The `sxHelpMenu:pageChanged` event refreshes the values as soon as the player opens the live page.
 
 When the menus are moved, the widget calls `Position` then `Refresh` on the builder and the guide calls `Update`, so both keep their page.
+
+## Exports
+
+### Client
+
+| Export | Description |
+| --- | --- |
+| `ShowGuide(duration?)` | Shows the guide, `duration` in milliseconds replaces `Config.Guide.duration`, `0` keeps it open |
+| `HideGuide()` | Hides the guide |
+| `IsGuideVisible()` | Returns whether the guide is shown |
+
+```lua
+exports.sxHelpMenu_example:ShowGuide()
+exports.sxHelpMenu_example:HideGuide()
+```
 
 ## License
 

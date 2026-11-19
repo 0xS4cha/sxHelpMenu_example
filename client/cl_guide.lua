@@ -1,13 +1,14 @@
 -- Guide made with the exports only, without the builder.
--- Three pages switched with the page key, hidden after Config.Guide.duration.
+-- Three pages switched with the page key. It stays open until HideGuide is called,
+-- or hides itself after Config.Guide.duration when it is above 0.
 
 local GUIDE_ID = 'example_guide'
 
-local function showGuide()
+local function showGuide(duration)
     exports.sxHelpMenu:Show({
         id = GUIDE_ID,
         position = Example.GetPosition(Config.Guide.position),
-        duration = Config.Guide.duration,
+        duration = duration or Config.Guide.duration,
         header = { subtitle = 'sxHelpMenu', title = 'Guide', watermark = 'Help' },
         pages = {
             {
@@ -43,9 +44,21 @@ local function showGuide()
     })
 end
 
+local function hideGuide()
+    return exports.sxHelpMenu:Hide(GUIDE_ID)
+end
+
+local function isGuideVisible()
+    return exports.sxHelpMenu:IsVisible(GUIDE_ID)
+end
+
+exports('ShowGuide', showGuide)
+exports('HideGuide', hideGuide)
+exports('IsGuideVisible', isGuideVisible)
+
 RegisterCommand(Config.Guide.command, function()
-    if exports.sxHelpMenu:IsVisible(GUIDE_ID) then
-        exports.sxHelpMenu:Hide(GUIDE_ID)
+    if isGuideVisible() then
+        hideGuide()
         return
     end
     showGuide()
