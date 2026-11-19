@@ -4,6 +4,14 @@
 -- ShowGuideFromTick shows it only while it is called every tick.
 
 local GUIDE_ID = 'example_guide'
+local GUIDE_IMAGE = ('nui://%s/images/guide.svg'):format(GetCurrentResourceName())
+local REWARD_DELAY = 15 * 60 * 1000
+local SKILL_THRESHOLDS = {
+    { value = 3, tone = 'danger' },
+    { value = 5, tone = 'warning' },
+}
+
+local rewardAt = GetGameTimer() + REWARD_DELAY
 
 local function buildGuide(duration)
     return {
@@ -16,18 +24,24 @@ local function buildGuide(duration)
                 title = 'Welcome',
                 icon = 'hand',
                 rows = {
-                    { type = 'text', label = 'Server', value = 'Los Santos', icon = 'map-pin' },
-                    { type = 'text', label = 'Status', value = 'Online', icon = 'wifi', tone = 'safe' },
-                    { type = 'bar', label = 'Players', value = #GetActivePlayers(), max = 64, display = ('%d / 64'):format(#GetActivePlayers()) },
+                    { type = 'image', label = 'Welcome to Los Santos', src = GUIDE_IMAGE, height = 120 },
+                    {
+                        type = 'stats',
+                        items = {
+                            { label = 'Players', value = ('%d / 64'):format(#GetActivePlayers()), icon = 'users' },
+                            { label = 'Status', value = 'Online', icon = 'wifi', tone = 'safe' },
+                            { label = 'Region', value = 'EU', icon = 'globe' },
+                        },
+                    },
                 },
             },
             {
                 title = 'Controls',
                 icon = 'keyboard',
                 rows = {
-                    { type = 'text', label = 'Next page', value = 'R', icon = 'arrow-right', tone = 'accent' },
-                    { type = 'text', label = 'Phone', value = 'Up arrow', icon = 'smartphone' },
-                    { type = 'text', label = 'Inventory', value = 'Tab', icon = 'backpack' },
+                    { type = 'keys', label = 'Menus', keys = { { key = 'R', label = 'Next page' } } },
+                    { type = 'keys', label = 'Player', keys = { { key = 'TAB', label = 'Inventory' }, { key = 'M', label = 'Map' } } },
+                    { type = 'keys', label = 'Vehicle', keys = { { key = 'F', label = 'Exit' }, { key = 'H', label = 'Lights' } } },
                 },
                 footer = { label = 'Bindings', items = { { value = 'Settings', icon = 'settings' } } },
             },
@@ -36,9 +50,10 @@ local function buildGuide(duration)
                 icon = 'lightbulb',
                 header = { subtitle = 'sxHelpMenu', title = 'Tips', watermark = 'Tips' },
                 rows = {
-                    { type = 'slider', label = 'Driving', value = 7.5, max = 10 },
-                    { type = 'slider', label = 'Shooting', value = 4.2, max = 10, tone = 'warning' },
-                    { type = 'slider', label = 'Stamina', value = 2.1, max = 10, tone = 'danger' },
+                    { type = 'slider', label = 'Driving', value = 7.5, max = 10, thresholds = SKILL_THRESHOLDS },
+                    { type = 'slider', label = 'Shooting', value = 4.2, max = 10, thresholds = SKILL_THRESHOLDS },
+                    { type = 'slider', label = 'Stamina', value = 2.1, max = 10, thresholds = SKILL_THRESHOLDS },
+                    { type = 'countdown', label = 'Daily reward', endsAt = rewardAt, icon = 'gift', done = 'Available', doneTone = 'safe' },
                 },
             },
         },
