@@ -24,10 +24,39 @@ local function getStats(vehicle)
     return stats
 end
 
-local function engineTone(health)
-    if health <= 0.3 then return 'danger' end
-    if health <= 0.6 then return 'warning' end
+local HEALTH_THRESHOLDS = {
+    { value = 0.3, tone = 'danger' },
+    { value = 0.6, tone = 'warning' },
+}
+
+local function healthTone(health)
+    for _, threshold in ipairs(HEALTH_THRESHOLDS) do
+        if health <= threshold.value then return threshold.tone end
+    end
     return 'safe'
+end
+
+local function vehicleImage(model)
+    return ('https://docs.fivem.net/vehicles/%s.webp'):format(GetDisplayNameFromVehicleModel(model):lower())
+end
+
+local function liveStats(vehicle)
+    local gear = GetVehicleCurrentGear(vehicle)
+    local body = Example.Clamp(GetVehicleBodyHealth(vehicle) / 1000.0, 0.0, 1.0)
+    local _, lightsState, highBeamsState = GetVehicleLightsState(vehicle)
+    local lights = lightsState == true or lightsState == 1
+    local highBeams = highBeamsState == true or highBeamsState == 1
+
+    return {
+        { label = 'Gear', value = gear == 0 and 'R' or tostring(gear), icon = 'cog' },
+        { label = 'Body', value = ('%d%%'):format(math.floor(body * 100 + 0.5)), icon = 'shield', tone = healthTone(body) },
+        {
+            label = 'Lights',
+            value = highBeams and 'High' or lights and 'On' or 'Off',
+            icon = 'lightbulb',
+            tone = lights and 'accent' or nil,
+        },
+    }
 end
 
 local function build(vehicle)
@@ -55,11 +84,12 @@ local function build(vehicle)
     widget:Page('Live', 'activity', 'live')
         :Bar('Speed', 0, { id = 'speed', max = math.max(stats.maxSpeed, 1.0), display = Example.FormatSpeed(0) })
         :Bar('RPM', 0, { id = 'rpm' })
-        :Text('Gear', 'N', { id = 'gear', icon = 'cog', scramble = false })
-        :Bar('Engine', health, { id = 'engine', tone = engineTone(health) })
+        :Bar('Engine', health, { id = 'engine', tone = 'safe', thresholds = HEALTH_THRESHOLDS })
+        :Stats(liveStats(vehicle), { id = 'live_stats' })
 
     local locked = GetVehicleDoorLockStatus(vehicle) > 1
     widget:Page('Info', 'info', 'info')
+        :Image(vehicleImage(model), { label = name, height = 110, fit = 'contain' })
         :Text('Plate', GetVehicleNumberPlateText(vehicle))
         :Text('Class', Example.Label(('VEH_CLASS_%d'):format(GetVehicleClass(vehicle))), { icon = 'car-front' })
         :Text('Seats', GetVehicleModelNumberOfSeats(model), { icon = 'armchair' })
@@ -67,19 +97,23 @@ local function build(vehicle)
             icon = locked and 'key-round' or 'lock-open',
             tone = locked and 'danger' or 'safe',
         })
+        :Keys({
+            { key = 'F', label = 'Exit' },
+            { key = 'H', label = 'Lights' },
+            { key = 'L', label = 'Lock' },
+        })
 
     return widget
 end
 
 local function updateLive(vehicle)
     local speed = GetEntitySpeed(vehicle)
-    local gear = GetVehicleCurrentGear(vehicle)
     local health = Example.Clamp(GetVehicleEngineHealth(vehicle) / 1000.0, 0.0, 1.0)
 
     menu:SetRow('speed', { value = speed, display = Example.FormatSpeed(speed) })
     menu:SetRow('rpm', { value = Example.Round(GetVehicleCurrentRpm(vehicle), 2) })
-    menu:SetRow('gear', { value = gear == 0 and 'R' or tostring(gear) })
-    menu:SetRow('engine', { value = Example.Round(health, 2), tone = engineTone(health) })
+    menu:SetRow('engine', { value = Example.Round(health, 2) })
+    menu:SetRow('live_stats', { items = liveStats(vehicle) })
 end
 
 function ExampleVehicle.Show(vehicle)
@@ -123,10 +157,14 @@ CreateThread(function()
         end
 
         if menu and menu:GetPage() == LIVE_PAGE then
-            local values = ('%d:%d:%d'):format(
+            local _, lights, highBeams = GetVehicleLightsState(vehicle)
+            local values = ('%d:%d:%d:%d:%s:%s'):format(
                 math.floor(GetEntitySpeed(vehicle) * 3.6),
                 GetVehicleCurrentGear(vehicle),
-                math.floor(GetVehicleCurrentRpm(vehicle) * 20)
+                math.floor(GetVehicleCurrentRpm(vehicle) * 20),
+                math.floor(GetVehicleBodyHealth(vehicle) / 10),
+                tostring(lights),
+                tostring(highBeams)
             )
             if values ~= lastValues then
                 lastValues = values
