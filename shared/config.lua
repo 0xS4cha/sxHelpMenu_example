@@ -9,7 +9,7 @@ Config.Vehicle = {
 Config.Guide = {
     command = 'helpexample',
     position = nil,
-    duration = 20000,
+    duration = 0,
 }
 
 Config.PositionCommand = 'helpexample_position'
