@@ -15,7 +15,7 @@ Examples of menus made with [sxHelpMenu](https://github.com/0xS4cha/sxHelpMenu):
 
 | Resource | Purpose |
 | --- | --- |
-| [sxHelpMenu](https://github.com/0xS4cha/sxHelpMenu) | Required. Draws the menus |
+| [sxHelpMenu](https://github.com/0xS4cha/sxHelpMenu) | Required. Draws the menus, `ShowThisFrame` is needed by `ShowGuideFromTick` |
 
 ## Installation
 
@@ -76,12 +76,22 @@ When the menus are moved, the widget calls `Position` then `Refresh` on the buil
 | Export | Description |
 | --- | --- |
 | `ShowGuide(duration?)` | Shows the guide, `duration` in milliseconds replaces `Config.Guide.duration`, `0` keeps it open |
+| `ShowGuideFromTick()` | Shows the guide only while it is called every tick, it hides about 100 ms after the last call |
 | `HideGuide()` | Hides the guide |
 | `IsGuideVisible()` | Returns whether the guide is shown |
 
 ```lua
 exports.sxHelpMenu_example:ShowGuide()
 exports.sxHelpMenu_example:HideGuide()
+```
+
+```lua
+CreateThread(function()
+    while true do
+        exports.sxHelpMenu_example:ShowGuideFromTick()
+        Wait(0)
+    end
+end)
 ```
 
 ## License
