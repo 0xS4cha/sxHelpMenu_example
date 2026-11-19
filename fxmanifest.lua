@@ -19,3 +19,7 @@ client_scripts {
     'client/cl_vehicle.lua',
     'client/cl_guide.lua',
 }
+
+files {
+    'images/*.svg',
+}
