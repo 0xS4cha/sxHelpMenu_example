@@ -1,11 +1,12 @@
 -- Guide made with the exports only, without the builder.
 -- Three pages switched with the page key. It stays open until HideGuide is called,
 -- or hides itself after Config.Guide.duration when it is above 0.
+-- ShowGuideFromTick shows it only while it is called every tick.
 
 local GUIDE_ID = 'example_guide'
 
-local function showGuide(duration)
-    exports.sxHelpMenu:Show({
+local function buildGuide(duration)
+    return {
         id = GUIDE_ID,
         position = Example.GetPosition(Config.Guide.position),
         duration = duration or Config.Guide.duration,
@@ -41,7 +42,18 @@ local function showGuide(duration)
                 },
             },
         },
-    })
+    }
+end
+
+local function showGuide(duration)
+    return exports.sxHelpMenu:Show(buildGuide(duration))
+end
+
+-- Call it every tick: the first call sends the guide, the next ones only keep it alive
+-- with its id, and sxHelpMenu hides it when the calls stop.
+local function showGuideFromTick()
+    if exports.sxHelpMenu:ShowThisFrame(GUIDE_ID) then return end
+    exports.sxHelpMenu:ShowThisFrame(buildGuide(0))
 end
 
 local function hideGuide()
@@ -53,6 +65,7 @@ local function isGuideVisible()
 end
 
 exports('ShowGuide', showGuide)
+exports('ShowGuideFromTick', showGuideFromTick)
 exports('HideGuide', hideGuide)
 exports('IsGuideVisible', isGuideVisible)
 
