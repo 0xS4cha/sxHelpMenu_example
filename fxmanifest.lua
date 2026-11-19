@@ -4,7 +4,7 @@ game 'gta5'
 name 'sxHelpMenu_example'
 description 'Examples of menus made with sxHelpMenu: a vehicle widget with live values and a guide'
 author '0xS4cha'
-version '1.0.0'
+version '1.1.0'
 repository 'https://github.com/0xS4cha/sxHelpMenu_example'
 
 lua54 'yes'
